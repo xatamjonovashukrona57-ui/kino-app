@@ -3,434 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineVault Ultimate Cinema</title>
+    <title>CineVault Cinema</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            /* Keng dala, maysalar, uylar va quyoshli orqa fon */
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)),
-                        url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000&auto=format&fit=crop') no-repeat center center fixed;
-            background-size: cover;
+            background: #0f172a;
             color: #ffffff;
-            min-height: 100vh;
             padding: 15px;
-            padding-bottom: 30px;
+            min-height: 100vh;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-bottom: 20px;
         }
 
         .header h1 {
             font-size: 24px;
-            color: #fff;
+            color: #38bdf8;
+            font-weight: 700;
         }
 
-        /* Navigatsiya Tablari */
-        .tabs {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        .tab-btn {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            white-space: nowrap;
-            cursor: pointer;
-        }
-
-        .tab-btn.active {
-            background: #ff7e5f;
-            border-color: #ff7e5f;
-            font-weight: bold;
-        }
-
-        /* Qidiruv Paneli (Nomi, Kodi va AI-Sujet) */
         .search-box {
-            position: relative;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .search-input {
             width: 100%;
-            padding: 12px 18px;
-            border-radius: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
+            padding: 14px 20px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            background: #1e293b;
             color: #fff;
-            font-size: 14px;
+            font-size: 15px;
             outline: none;
+            transition: 0.3s;
         }
 
-        .search-input::placeholder {
-            color: #ccc;
+        .search-input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
         }
 
-        /* Bo'limlar interfeysi */
-        .view-section {
-            display: none;
+        .movie-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        .view-section.active {
-            display: block;
-        }
-
-        /* Kino Kartochkalari */
         .movie-card {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            padding: 12px;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         .movie-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
         }
 
         .movie-title {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
-            color: #ffb74d;
+            color: #f8fafc;
         }
 
-        .movie-desc {
-            font-size: 12px;
-            color: #ddd;
-            margin-bottom: 10px;
-            line-height: 1.4;
-        }
-
-        .movie-controls {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 8px;
-        }
-
-        select, button {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 6px 10px;
+        .movie-code {
+            background: #0284c7;
+            color: #fff;
+            padding: 4px 10px;
             border-radius: 8px;
-            font-size: 11px;
-            outline: none;
-        }
-
-        option {
-            background: #222;
-            color: white;
-        }
-
-        .btn-main {
-            background: linear-gradient(45deg, #ff7e5f, #feb47b);
-            border: none;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
+            font-size: 12px;
             font-weight: bold;
-            cursor: pointer;
-            width: 100%;
+        }
+
+        .movie-genre {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .action-btns {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
             margin-top: 5px;
         }
 
-        /* Shorts Reel Oynasi */
-        .reel-box {
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            height: 350px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        /* Match Mode Card (Tinder) */
-        .match-card {
-            background: rgba(0,0,0,0.85);
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            border: 2px solid #ff7e5f;
-        }
-
-        .match-btns {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 15px;
-        }
-
-        .btn-like { background: #4caf50; font-size: 18px; padding: 10px 25px; border-radius: 50px; }
-        .btn-dislike { background: #f44336; font-size: 18px; padding: 10px 25px; border-radius: 50px; }
-
-        /* Sharhlar Bo'limi */
-        .comments-section {
-            margin-top: 8px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 8px;
-            font-size: 11px;
-        }
-
-        .comment-input {
-            width: 70%;
-            padding: 4px 8px;
-            border-radius: 5px;
+        button {
+            padding: 10px;
+            border-radius: 10px;
             border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-play {
+            background: #22c55e;
+            color: white;
+            grid-column: span 2;
+            font-size: 15px;
+        }
+
+        .btn-copy {
+            background: #334155;
+            color: #f8fafc;
+        }
+
+        .btn-share {
+            background: #0284c7;
+            color: white;
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        .empty-msg {
+            text-align: center;
+            color: #94a3b8;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>☀️ CineVault Cinema Hub</h1>
+        <h1>🎬 CineVault Cinema</h1>
     </div>
 
-    <!-- Bo'limlar Navigatsiyasi -->
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('catalog')">🎬 Katalog & AI Search</button>
-        <button class="tab-btn" onclick="switchTab('shorts')">📱 Shorts / Reels</button>
-        <button class="tab-btn" onclick="switchTab('match')">💖 Match (Tinder)</button>
-        <button class="tab-btn" onclick="switchTab('party')">🍿 Watch Party</button>
-        <button class="tab-btn" onclick="switchTab('favs')">⭐ Izbrannoye</button>
+    <div class="search-box">
+        <input type="text" id="searchInput" class="search-input" 
+               placeholder="🔍 Kino nomi, kodi yoki linkini yozing..." 
+               oninput="searchMovies()">
     </div>
 
-    <!-- 1-BO'LIM: KATALOG VA AI SEARCH -->
-    <div id="catalog" class="view-section active">
-        <div class="search-box">
-            <input type="text" id="searchInput" class="search-input" 
-                   placeholder="Qidiruv: Nomi, kodi yoki sujetini yozing (masalan: kosmos, vaqt)..." 
-                   onkeyup="filterMovies()">
-        </div>
-
-        <div style="margin-bottom: 10px; font-size: 12px;">
-            📸 <b>Skrinshot orqali qidirish:</b> 
-            <input type="file" id="imgSearch" accept="image/*" onchange="searchByImage()" style="display:none;">
-            <button onclick="document.getElementById('imgSearch').click()">Rasm yuklash</button>
-        </div>
-
-        <div id="movieList">
-            <!-- 1-Kino Kartochkasi -->
-            <div class="movie-card" data-search="qasoskorlar avengers 101 jangari superqahramon yer robot">
-                <div class="movie-header">
-                    <span class="movie-title">1. Qasoskorlar (kod: 101)</span>
-                    <span>⭐ 8.5/10</span>
-                </div>
-                <p class="movie-desc">Sujet: Yer shari xavf ostida qolganda superqahramonlar birgalikda insoniyatni qutqarish uchun birlashadilar.</p>
-                
-                <!-- Sifat va Audio Tanlovi -->
-                <div class="movie-controls">
-                    <select id="quality-101">
-                        <option value="1080p">Sifat: 1080p Full HD</option>
-                        <option value="720p">Sifat: 720p HD</option>
-                        <option value="360p">Sifat: 360p Low</option>
-                    </select>
-                    <select id="audio-101">
-                        <option value="uzb">Ovoz: O'zbekcha Dublyaj</option>
-                        <option value="eng">Ovoz: Original (English)</option>
-                    </select>
-                    <button onclick="toggleFav('101')">⭐ Saqlash</button>
-                </div>
-
-                <button class="btn-main" onclick="playMovie('101')">▶️ Tomosha qilish</button>
-
-                <!-- Sharh va Baho -->
-                <div class="comments-section">
-                    <p><b>Izohlar:</b> "Juda ajoyib kino!" - *Ali*</p>
-                    <input type="text" placeholder="Sharh yozing..." class="comment-input" id="comm-101">
-                    <button onclick="addComment('101')">Yuborish</button>
-                </div>
-            </div>
-
-            <!-- 2-Kino Kartochkasi -->
-            <div class="movie-card" data-search="interstellar 102 kosmos vaqt ilmiy qora tuynuk planeta">
-                <div class="movie-header">
-                    <span class="movie-title">2. Interstellar (kod: 102)</span>
-                    <span>⭐ 8.7/10</span>
-                </div>
-                <p class="movie-desc">Sujet: Kosmonavtlar jamoasi insoniyat uchun yangi uy topish maqsadida qora tuynuk orqali boshqa galaktikaga yo'l oladi.</p>
-                
-                <div class="movie-controls">
-                    <select id="quality-102">
-                        <option value="1080p">Sifat: 1080p Full HD</option>
-                        <option value="720p">Sifat: 720p HD</option>
-                    </select>
-                    <select id="audio-102">
-                        <option value="uzb">Ovoz: O'zbekcha Dublyaj</option>
-                        <option value="eng">Ovoz: English</option>
-                    </select>
-                    <button onclick="toggleFav('102')">⭐ Saqlash</button>
-                </div>
-
-                <button class="btn-main" onclick="playMovie('102')">▶️ Tomosha qilish</button>
-
-                <div class="comments-section">
-                    <p><b>Izohlar:</b> "Musiqasi dahshat!" - *Vali*</p>
-                    <input type="text" placeholder="Sharh yozing..." class="comment-input" id="comm-102">
-                    <button onclick="addComment('102')">Yuborish</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2-BO'LIM: SHORTS / REELS -->
-    <div id="shorts" class="view-section">
-        <div class="reel-box">
-            <h3 id="reelTitle">🎬 Qasoskorlar (Treyler)</h3>
-            <p style="margin: 15px 0; font-size: 13px;">30 sekundlik eng qiziq kadr...</p>
-            <button class="btn-main" onclick="nextReel()">➡️ Keyingi Treyler (Swipe)</button>
-            <button class="btn-main" style="margin-top:8px; background:#4caf50;" onclick="playMovie('101')">To'liq ko'rish</button>
-        </div>
-    </div>
-
-    <!-- 3-BO'LIM: MATCH MODE (TINDER) -->
-    <div id="match" class="view-section">
-        <div class="match-card">
-            <h3 id="matchTitle">Interstellar</h3>
-            <p style="font-size: 12px; margin: 10px 0;">Do'stingiz bilan bir xil kinoni tanlang va birga ko'ring!</p>
-            <div class="match-btns">
-                <button class="btn-dislike" onclick="nextMatch(false)">❌ Otmena</button>
-                <button class="btn-like" onclick="nextMatch(true)">💚 Yoqdi (Match)</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4-BO'LIM: WATCH PARTY -->
-    <div id="party" class="view-section">
-        <div class="movie-card">
-            <h3>🍿 Do'stlar bilan birga tomosha qilish</h3>
-            <p class="movie-desc">Maxsus xona yarating va bir vaqtda sinxron ko'ring!</p>
-            <button class="btn-main" onclick="createParty()">Sinxron xona yaratish (Link olish)</button>
-        </div>
-    </div>
-
-    <!-- 5-BO'LIM: IZBRANNOYE -->
-    <div id="favs" class="view-section">
-        <h3>⭐ Saqlangan Kinolaringiz</h3>
-        <div id="favList" style="margin-top: 10px;">
-            <p style="font-size: 12px; color: #ccc;">Hali hech qanday kino saqlanmadi.</p>
-        </div>
+    <div class="movie-list" id="movieList">
+        <p class="empty-msg">Kinolat yuklanmoqda...</p>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let favorites = [];
-        let reels = ["Qasoskorlar", "Interstellar", "Avatar 2"];
-        let reelIdx = 0;
+        const urlParams = new URLSearchParams(window.location.search);
+        let moviesData = [];
 
-        // Tablarni almashtirish
-        function switchTab(tabId) {
-            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
+        try {
+            const rawData = urlParams.get('data');
+            if (rawData) {
+                moviesData = JSON.parse(decodeURIComponent(rawData));
+            }
+        } catch (e) {
+            console.error("Ma'lumotlarni o'qishda xatolik:", e);
         }
 
-        // AI va kalit so'zlar bo'yicha mukammal Qidiruv
-        function filterMovies() {
-            let input = document.getElementById('searchInput').value.toLowerCase();
-            let cards = document.querySelectorAll('#movieList .movie-card');
+        function renderMovies(list) {
+            const container = document.getElementById('movieList');
+            if (!list || list.length === 0) {
+                container.innerHTML = '<p class="empty-msg">❌ Hech qanday kino topilmadi</p>';
+                return;
+            }
 
-            cards.forEach(card => {
-                let searchData = card.getAttribute('data-search').toLowerCase();
-                if (searchData.includes(input)) {
-                    card.style.display = "block";
-                } else {
-                    card.style.display = "none";
-                }
-            });
+            container.innerHTML = list.map(movie => `
+                <div class="movie-card">
+                    <div class="movie-header">
+                        <div class="movie-title">${movie.title}</div>
+                        <div class="movie-code">ID: ${movie.code}</div>
+                    </div>
+                    <div class="movie-genre">🎭 Janri: ${movie.genre}</div>
+                    <div class="action-btns">
+                        <button class="btn-play" onclick="playMovie('${movie.code}')">▶️ Ko'rish</button>
+                        <button class="btn-copy" onclick="copyToClipboard('${movie.code}')">📋 Kodni nusxalash</button>
+                        <button class="btn-share" onclick="shareMovie('${movie.title}', '${movie.code}')">🚀 Ulashish</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // Skrinshot orqali qidirish simulyatsiyasi
-        function searchByImage() {
-            alert("📸 Rasm skani amalga oshirildi! Mos keluvchi kino: Interstellar (102)");
-            document.getElementById('searchInput').value = "102";
-            filterMovies();
+        renderMovies(moviesData);
+
+        function searchMovies() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filtered = moviesData.filter(m => 
+                m.title.toLowerCase().includes(query) || 
+                m.code.toString().includes(query) ||
+                (m.link && m.link.toLowerCase().includes(query))
+            );
+            renderMovies(filtered);
         }
 
-        // Kinoni botga tanlangan Sifat va Audio bilan yuborish
         function playMovie(code) {
-            let quality = document.getElementById(`quality-${code}`) ? document.getElementById(`quality-${code}`).value : '1080p';
-            let audio = document.getElementById(`audio-${code}`) ? document.getElementById(`audio-${code}`).value : 'uzb';
-            
-            // Botga barcha tanlangan parametrlarni birgalikda yuboramiz
-            let payload = `CODE:${code}|QUAL:${quality}|AUDIO:${audio}`;
-            tg.sendData(payload);
+            tg.sendData(code);
         }
 
-        // Shorts/Reels almashtirish
-        function nextReel() {
-            reelIdx = (reelIdx + 1) % reels.length;
-            document.getElementById('reelTitle').innerText = "🎬 " + reels[reelIdx] + " (Treyler)";
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            tg.showAlert("📋 Kino kodi nusxalandi: " + text);
         }
 
-        // Match Mode (Tinder)
-        function nextMatch(isLike) {
-            if (isLike) {
-                alert("🎉 MATCH! Do'stingiz ham bu kinoni tanlagan. Birga tomosha qilishingiz mumkin!");
-            }
-            document.getElementById('matchTitle').innerText = "Avatar: Suv Yoli";
-        }
-
-        // Watch Party Link yaratish
-        function createParty() {
-            let partyLink = "https://t.me/CineVault_bot?start=party_98234";
-            alert("Sinxron xona havolasi yaratildi:\n" + partyLink + "\n\nDo'stingizga yuboring!");
-        }
-
-        // Izbrannoyega qo'shish
-        function toggleFav(code) {
-            if (!favorites.includes(code)) {
-                favorites.push(code);
-                alert("⭐ Kino Izbrannoyega qo'shildi!");
-                updateFavs();
-            } else {
-                alert("Bu kino allaqachon saqlangan!");
-            }
-        }
-
-        function updateFavs() {
-            let favDiv = document.getElementById('favList');
-            if (favorites.length === 0) return;
-            favDiv.innerHTML = favorites.map(id => `<div class="movie-card">Kino kodi: ${id} <button onclick="playMovie('${id}')">Ko'rish</button></div>`).join('');
-        }
-
-        // Sharh qoldirish
-        function addComment(code) {
-            let val = document.getElementById(`comm-${code}`).value;
-            if (val) {
-                alert("Sharhingiz qabul qilindi va monologda saqlandi!");
-                document.getElementById(`comm-${code}`).value = "";
-            }
+        function shareMovie(title, code) {
+            const shareText = `🍿 "${title}" kinosini ko'rish uchun botga kiring va ushbu kodni yuboring: ${code}`;
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(shareText)}`;
+            tg.openTelegramLink(shareUrl);
         }
     </script>
 </body>
